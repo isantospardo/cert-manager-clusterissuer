@@ -1,0 +1,38 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: {{ .Values.clusterIssuerName }}
+  annotations:
+    # ArgoCD needs to wait until the ClusterIssuer CRD has been deployed by another ArgoCD application
+    # before creating this custom resource.
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+spec:
+  acme:
+    # The ACME server URL
+    server: {{ .Values.acme.server }}
+    # Email address used for ACME registration
+    email: {{ .Values.acme.email }}
+    # Name of a secret used to store the ACME account private key
+    privateKeySecretRef:
+      name: letsencrypt
+    solvers:
+    - dns01:
+        rfc2136:
+          # This field is required.
+          nameserver: {{ .Values.acme.dns01.internalServerName }}
+          # The TSIG Key name configured in the DNS.
+          # If ``tsigSecretSecretRef`` is defined, this field is required.
+          # +optional
+          tsigKeyName: {{ .Values.acme.dns01.tsigKeyName }}
+          # The TSIG Algorithm configured in the DNS supporting RFC2136. Used only
+          # when ``tsigSecretSecretRef`` and ``tsigKeyName`` are defined.
+          # Supported values are (case-insensitive): ``HMACMD5`` (default),
+          # ``HMACSHA1``, ``HMACSHA256`` or ``HMACSHA512``.
+          # +optional
+          tsigAlgorithm: HMACMD5
+          # The name of the secret containing the TSIG value.
+          # If ``tsigKeyName`` is defined, this field is required.
+          # +optional
+          tsigSecretSecretRef:
+            name: {{ .Values.tsigSecret.name }}
+            key: {{ .Values.tsigSecret.key }}

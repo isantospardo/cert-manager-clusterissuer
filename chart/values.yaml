@@ -1,0 +1,10 @@
+acme:
+  server: https://acme-staging-v02.api.letsencrypt.org/directory
+  email: "" # required
+  dns01:
+    tsigKeyName: "" # required
+    internalServerName: "" # required
+
+tsigSecret:
+  name: "" # required
+  key: "" # required
